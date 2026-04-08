@@ -43,6 +43,9 @@ position: fixed;
 width: 100%;
 }
 
+#app { display: none; }
+#app.visible { display: flex; }
+
 /* ── LAYOUT ── */
 #app {
 display: flex;
@@ -487,7 +490,7 @@ transform: translateX(-50%) translateY(0);
 position: fixed; inset: 0;
 background: var(–bg);
 z-index: 200;
-display: flex;
+display: none;
 flex-direction: column;
 padding: 40px 24px calc(40px + var(–safe-bottom));
 padding-top: calc(40px + var(–safe-top));
@@ -876,9 +879,11 @@ function init() {
   loadState();
   const isSetup = state.apiKey;
   if (!isSetup) {
-    document.getElementById('setup-overlay').classList.remove('hidden');
+    document.getElementById('setup-overlay').style.display = 'flex';
+    document.getElementById('app').classList.remove('visible');
   } else {
-    document.getElementById('setup-overlay').classList.add('hidden');
+    document.getElementById('setup-overlay').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
     bootApp();
   }
 }
@@ -1250,7 +1255,8 @@ function saveSetup() {
   state.todayMeals = [];
   state.history = {};
   saveState();
-  document.getElementById('setup-overlay').classList.add('hidden');
+  document.getElementById('setup-overlay').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
   bootApp();
 }
 
