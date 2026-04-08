@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NutriCoach">
+<meta name="theme-color" content="#0a0a0f">
+<title>NutriCoach</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c26;
+  --border: #2a2a38;
+  --accent: #c8f060;
+  --accent2: #60f0c8;
+  --accent3: #f060a8;
+  --text: #f0f0f8;
+  --muted: #6b6b88;
+  --danger: #f06060;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --r: 14px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+- { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+height: 100%;
+background: var(–bg);
+color: var(–text);
+font-family: var(–font-display);
+overflow: hidden;
+position: fixed;
+width: 100%;
+}
+
+/* ── LAYOUT ── */
+#app {
+display: flex;
+flex-direction: column;
+height: 100%;
+padding-top: var(–safe-top);
+}
+
+.screen {
+display: none;
+flex-direction: column;
+flex: 1;
+overflow: hidden;
+}
+.screen.active { display: flex; }
+
+.scroll-area {
+flex: 1;
+overflow-y: auto;
+-webkit-overflow-scrolling: touch;
+padding: 16px 16px calc(16px + var(–safe-bottom));
+}
+
+/* ── HEADER ── */
+.header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 12px 16px 8px;
+border-bottom: 1px solid var(–border);
+flex-shrink: 0;
+}
+.header-logo {
+font-size: 18px;
+font-weight: 800;
+letter-spacing: -0.5px;
+}
+.header-logo span { color: var(–accent); }
+.header-date {
+font-family: var(–font-mono);
+font-size: 11px;
+color: var(–muted);
+letter-spacing: 0.5px;
+}
+.icon-btn {
+width: 36px; height: 36px;
+border-radius: 10px;
+background: var(–surface2);
+border: 1px solid var(–border);
+display: flex; align-items: center; justify-content: center;
+cursor: pointer; color: var(–text); font-size: 16px;
+transition: background 0.15s;
+}
+.icon-btn:active { background: var(–border); }
+
+/* ── BOTTOM NAV ── */
+.nav {
+display: flex;
+border-top: 1px solid var(–border);
+background: var(–surface);
+padding-bottom: var(–safe-bottom);
+flex-shrink: 0;
+}
+.nav-item {
+flex: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 3px;
+padding: 10px 4px 8px;
+cursor: pointer;
+color: var(–muted);
+font-size: 10px;
+font-family: var(–font-mono);
+letter-spacing: 0.3px;
+transition: color 0.15s;
+-webkit-user-select: none;
+}
+.nav-item.active { color: var(–accent); }
+.nav-item svg { width: 22px; height: 22px; }
+
+/* ── CARDS ── */
+.card {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–r);
+padding: 16px;
+margin-bottom: 12px;
+}
+.card-label {
+font-family: var(–font-mono);
+font-size: 10px;
+color: var(–muted);
+letter-spacing: 1px;
+text-transform: uppercase;
+margin-bottom: 8px;
+}
+
+/* ── DASHBOARD MAIN RING ── */
+.calorie-hero {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–r);
+padding: 20px;
+margin-bottom: 12px;
+display: flex;
+align-items: center;
+gap: 20px;
+}
+.ring-wrap {
+position: relative;
+width: 110px;
+height: 110px;
+flex-shrink: 0;
+}
+.ring-wrap svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(–surface2); stroke-width: 8; }
+.ring-fill { fill: none; stroke: var(–accent); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1); }
+.ring-center {
+position: absolute;
+inset: 0;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+}
+.ring-val { font-size: 22px; font-weight: 800; line-height: 1; }
+.ring-unit { font-family: var(–font-mono); font-size: 10px; color: var(–muted); }
+.calorie-stats { flex: 1; }
+.stat-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 5px 0;
+border-bottom: 1px solid var(–border);
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-lbl { font-family: var(–font-mono); font-size: 11px; color: var(–muted); }
+.stat-val { font-weight: 700; font-size: 15px; }
+.stat-val.ok { color: var(–accent); }
+.stat-val.warn { color: var(–accent3); }
+
+/* ── MACRO BARS ── */
+.macro-grid { display: flex; gap: 8px; margin-bottom: 12px; }
+.macro-card {
+flex: 1;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–r);
+padding: 12px;
+}
+.macro-name { font-family: var(–font-mono); font-size: 9px; color: var(–muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+.macro-val { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+.macro-bar { height: 4px; border-radius: 2px; background: var(–surface2); overflow: hidden; }
+.macro-fill { height: 100%; border-radius: 2px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+.macro-sub { font-family: var(–font-mono); font-size: 9px; color: var(–muted); margin-top: 4px; }
+
+/* ── AI FEEDBACK ── */
+.ai-card {
+background: linear-gradient(135deg, #1a1f12 0%, #131a1a 100%);
+border: 1px solid #3a4030;
+border-radius: var(–r);
+padding: 16px;
+margin-bottom: 12px;
+position: relative;
+overflow: hidden;
+}
+.ai-card::before {
+content: ‘’;
+position: absolute;
+top: -20px; right: -20px;
+width: 80px; height: 80px;
+background: radial-gradient(circle, rgba(200,240,96,0.12) 0%, transparent 70%);
+}
+.ai-badge {
+display: inline-flex;
+align-items: center;
+gap: 5px;
+font-family: var(–font-mono);
+font-size: 9px;
+color: var(–accent);
+letter-spacing: 1px;
+text-transform: uppercase;
+margin-bottom: 8px;
+}
+.ai-badge::before { content: ‘●’; animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.ai-text { font-size: 13px; line-height: 1.6; color: #c8c8d8; }
+
+/* ── MEALS LIST ── */
+.meal-item {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 12px;
+margin-bottom: 8px;
+display: flex;
+align-items: flex-start;
+gap: 10px;
+}
+.meal-time {
+font-family: var(–font-mono);
+font-size: 10px;
+color: var(–muted);
+flex-shrink: 0;
+margin-top: 2px;
+}
+.meal-content { flex: 1; min-width: 0; }
+.meal-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.meal-macros { font-family: var(–font-mono); font-size: 10px; color: var(–muted); }
+.meal-kcal { font-size: 15px; font-weight: 700; color: var(–accent); flex-shrink: 0; }
+.meal-delete {
+background: none; border: none; color: var(–muted);
+font-size: 18px; cursor: pointer; padding: 0 4px;
+transition: color 0.15s;
+}
+.meal-delete:active { color: var(–danger); }
+
+/* ── ADD MEAL SCREEN ── */
+.add-hero {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–r);
+padding: 16px;
+margin-bottom: 12px;
+}
+.add-label {
+font-family: var(–font-mono);
+font-size: 10px;
+color: var(–muted);
+letter-spacing: 1px;
+text-transform: uppercase;
+margin-bottom: 10px;
+}
+textarea {
+width: 100%;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 10px;
+color: var(–text);
+font-family: var(–font-display);
+font-size: 15px;
+padding: 14px;
+resize: none;
+outline: none;
+transition: border-color 0.2s;
+line-height: 1.5;
+}
+textarea:focus { border-color: var(–accent); }
+textarea::placeholder { color: var(–muted); }
+
+.examples {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+margin-top: 10px;
+}
+.example-chip {
+font-family: var(–font-mono);
+font-size: 10px;
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 20px;
+padding: 5px 10px;
+cursor: pointer;
+color: var(–muted);
+transition: all 0.15s;
+}
+.example-chip:active { background: var(–border); color: var(–text); }
+
+.btn-primary {
+width: 100%;
+padding: 16px;
+background: var(–accent);
+color: #0a0a0f;
+border: none;
+border-radius: var(–r);
+font-family: var(–font-display);
+font-size: 15px;
+font-weight: 700;
+cursor: pointer;
+letter-spacing: 0.3px;
+transition: opacity 0.15s, transform 0.1s;
+margin-top: 12px;
+}
+.btn-primary:active { opacity: 0.85; transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.4; }
+
+/* ── RESULT CARD ── */
+.result-card {
+background: var(–surface);
+border: 1px solid var(–accent);
+border-radius: var(–r);
+padding: 16px;
+margin-top: 12px;
+display: none;
+}
+.result-card.show { display: block; }
+.result-macros { display: flex; gap: 10px; margin: 12px 0; }
+.result-macro {
+flex: 1;
+text-align: center;
+background: var(–surface2);
+border-radius: 10px;
+padding: 10px 6px;
+}
+.result-macro-val { font-size: 20px; font-weight: 800; }
+.result-macro-lbl { font-family: var(–font-mono); font-size: 9px; color: var(–muted); margin-top: 2px; letter-spacing: 0.5px; }
+.result-tip { font-size: 12px; color: #c8c8d8; line-height: 1.6; border-top: 1px solid var(–border); padding-top: 10px; margin-top: 2px; }
+
+.btn-add-confirm {
+width: 100%;
+padding: 14px;
+background: transparent;
+color: var(–accent);
+border: 1px solid var(–accent);
+border-radius: var(–r);
+font-family: var(–font-display);
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+margin-top: 10px;
+transition: all 0.15s;
+}
+.btn-add-confirm:active { background: rgba(200,240,96,0.1); }
+
+/* ── HISTORY ── */
+.history-day {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–r);
+padding: 14px;
+margin-bottom: 10px;
+}
+.history-day-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 10px;
+}
+.history-day-date { font-weight: 700; font-size: 14px; }
+.history-day-kcal { font-family: var(–font-mono); font-size: 12px; color: var(–accent); }
+.history-bar { height: 3px; background: var(–surface2); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+.history-bar-fill { height: 100%; border-radius: 2px; background: var(–accent); }
+.history-macros { font-family: var(–font-mono); font-size: 10px; color: var(–muted); }
+
+/* ── SETTINGS ── */
+.settings-section { margin-bottom: 20px; }
+.settings-title {
+font-family: var(–font-mono);
+font-size: 10px;
+letter-spacing: 1.5px;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 10px;
+}
+.settings-row {
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: var(–r);
+overflow: hidden;
+}
+.settings-item {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 14px 16px;
+border-bottom: 1px solid var(–border);
+}
+.settings-item:last-child { border-bottom: none; }
+.settings-item-label { font-size: 14px; font-weight: 600; }
+.settings-item-sub { font-family: var(–font-mono); font-size: 10px; color: var(–muted); margin-top: 2px; }
+
+input[type=“number”], input[type=“text”], input[type=“password”] {
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 8px;
+color: var(–text);
+font-family: var(–font-mono);
+font-size: 14px;
+padding: 8px 12px;
+width: 110px;
+text-align: right;
+outline: none;
+transition: border-color 0.2s;
+}
+input[type=“text”].full, input[type=“password”].full { width: 100%; text-align: left; margin-top: 8px; }
+input:focus { border-color: var(–accent); }
+
+.btn-save {
+width: 100%;
+padding: 14px;
+background: var(–surface2);
+color: var(–text);
+border: 1px solid var(–border);
+border-radius: var(–r);
+font-family: var(–font-display);
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+margin-top: 8px;
+transition: all 0.15s;
+}
+.btn-save:active { background: var(–border); }
+
+/* ── LOADING ── */
+.loading-dots { display: inline-flex; gap: 4px; align-items: center; }
+.loading-dots span {
+width: 6px; height: 6px;
+background: var(–accent);
+border-radius: 50%;
+animation: bounce 1.2s infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+/* ── TOAST ── */
+#toast {
+position: fixed;
+bottom: calc(70px + var(–safe-bottom));
+left: 50%; transform: translateX(-50%) translateY(20px);
+background: var(–surface2);
+border: 1px solid var(–border);
+border-radius: 30px;
+padding: 10px 20px;
+font-size: 13px;
+font-family: var(–font-mono);
+opacity: 0;
+transition: all 0.3s;
+pointer-events: none;
+white-space: nowrap;
+z-index: 100;
+}
+#toast.show {
+opacity: 1;
+transform: translateX(-50%) translateY(0);
+}
+
+/* ── SETUP OVERLAY ── */
+#setup-overlay {
+position: fixed; inset: 0;
+background: var(–bg);
+z-index: 200;
+display: flex;
+flex-direction: column;
+padding: 40px 24px calc(40px + var(–safe-bottom));
+padding-top: calc(40px + var(–safe-top));
+}
+#setup-overlay.hidden { display: none; }
+.setup-logo { font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+.setup-logo span { color: var(–accent); }
+.setup-sub { font-family: var(–font-mono); font-size: 12px; color: var(–muted); margin-bottom: 32px; letter-spacing: 0.5px; }
+.setup-step { margin-bottom: 20px; }
+.setup-step-label { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.setup-step-hint { font-family: var(–font-mono); font-size: 10px; color: var(–muted); margin-bottom: 8px; line-height: 1.6; }
+
+/* ── EMPTY STATE ── */
+.empty {
+text-align: center;
+padding: 40px 20px;
+color: var(–muted);
+font-family: var(–font-mono);
+font-size: 12px;
+line-height: 1.8;
+}
+.empty-icon { font-size: 32px; margin-bottom: 12px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 0; }
+</style>
+
+</head>
+<body>
+
+<!-- SETUP OVERLAY -->
+
+<div id="setup-overlay">
+  <div class="setup-logo">Nutri<span>Coach</span></div>
+  <div class="setup-sub">// CONFIGURATION INITIALE</div>
+
+  <div style="flex:1; overflow-y:auto;">
+    <div class="setup-step">
+      <div class="setup-step-label">🔑 Clé API Claude (Anthropic)</div>
+      <div class="setup-step-hint">Récupère ta clé sur console.anthropic.com → API Keys.<br>Elle est stockée uniquement sur cet appareil.</div>
+      <input type="password" class="full" id="setup-apikey" placeholder="sk-ant-...">
+    </div>
+
+```
+<div class="setup-step">
+  <div class="setup-step-label">📊 Google Sheets (optionnel)</div>
+  <div class="setup-step-hint">Pour sauvegarder ton historique dans Sheets, entre l'URL de ton Apps Script web app.<br>Laisse vide pour désactiver.</div>
+  <input type="text" class="full" id="setup-sheets" placeholder="https://script.google.com/macros/s/...">
+</div>
+
+<div class="setup-step">
+  <div class="setup-step-label">🎯 Tes objectifs</div>
+  <div style="display:flex; flex-direction:column; gap:10px; margin-top:8px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:13px;">Calories / jour</span>
+      <input type="number" id="setup-kcal" placeholder="2000">
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:13px;">Protéines (g)</span>
+      <input type="number" id="setup-protein" placeholder="170">
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:13px;">Glucides (g)</span>
+      <input type="number" id="setup-carbs" placeholder="180">
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:13px;">Lipides (g)</span>
+      <input type="number" id="setup-fat" placeholder="60">
+    </div>
+  </div>
+</div>
+
+<div style="background:var(--surface); border:1px solid var(--border); border-radius:var(--r); padding:14px; margin-bottom:16px;">
+  <div style="font-family:var(--font-mono); font-size:10px; color:var(--accent); letter-spacing:1px; margin-bottom:6px;">GUIDE SHEETS (optionnel)</div>
+  <div style="font-family:var(--font-mono); font-size:10px; color:var(--muted); line-height:1.8;">
+    1. Va sur script.google.com<br>
+    2. Nouveau projet → colle le script ci-dessous<br>
+    3. Déployer → Web app → Tout le monde → Copie l'URL
+  </div>
+  <div id="script-code" style="background:var(--surface2); border-radius:8px; padding:10px; margin-top:8px; font-family:var(--font-mono); font-size:9px; color:var(--muted); line-height:1.6; white-space:pre-wrap; cursor:pointer;" onclick="copyScript()">function doPost(e) {
+```
+
+const data = JSON.parse(e.postData.contents);
+const ss = SpreadsheetApp.openById(‘VOTRE_SHEET_ID’);
+const sheet = ss.getSheetByName(‘Log’) || ss.insertSheet(‘Log’);
+if (sheet.getLastRow() === 0) {
+sheet.appendRow([‘Date’,‘Repas’,‘Calories’,‘Proteines’,‘Glucides’,‘Lipides’]);
+}
+sheet.appendRow([data.date, data.meal, data.kcal, data.protein, data.carbs, data.fat]);
+return ContentService.createTextOutput(‘ok’);
+}</div>
+<div style="font-family:var(--font-mono); font-size:9px; color:var(--muted); margin-top:4px; text-align:center;">↑ Appuie pour copier</div>
+</div>
+
+  </div>
+
+<button class="btn-primary" onclick="saveSetup()">Démarrer →</button>
+
+</div>
+
+<!-- APP -->
+
+<div id="app">
+  <!-- SCREEN: DASHBOARD -->
+  <div class="screen active" id="screen-home">
+    <div class="header">
+      <div>
+        <div class="header-logo">Nutri<span>Coach</span></div>
+        <div class="header-date" id="header-date"></div>
+      </div>
+      <div class="icon-btn" onclick="refreshAI()" title="Analyse IA">⚡</div>
+    </div>
+    <div class="scroll-area">
+      <!-- CALORIE RING -->
+      <div class="calorie-hero">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 110 110">
+            <circle class="ring-bg" cx="55" cy="55" r="46"/>
+            <circle class="ring-fill" id="kcal-ring" cx="55" cy="55" r="46"
+              stroke-dasharray="289" stroke-dashoffset="289"/>
+          </svg>
+          <div class="ring-center">
+            <div class="ring-val" id="kcal-consumed">0</div>
+            <div class="ring-unit">kcal</div>
+          </div>
+        </div>
+        <div class="calorie-stats">
+          <div class="stat-row">
+            <span class="stat-lbl">OBJECTIF</span>
+            <span class="stat-val" id="kcal-goal-display">—</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-lbl">RESTANT</span>
+            <span class="stat-val ok" id="kcal-remaining">—</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-lbl">REPAS</span>
+            <span class="stat-val" id="meal-count">0</span>
+          </div>
+        </div>
+      </div>
+
+```
+  <!-- MACROS -->
+  <div class="macro-grid">
+    <div class="macro-card">
+      <div class="macro-name">Protéines</div>
+      <div class="macro-val" id="m-protein">0<span style="font-size:11px;color:var(--muted)">g</span></div>
+      <div class="macro-bar"><div class="macro-fill" id="b-protein" style="width:0%;background:var(--accent)"></div></div>
+      <div class="macro-sub" id="s-protein">/ —g</div>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Glucides</div>
+      <div class="macro-val" id="m-carbs">0<span style="font-size:11px;color:var(--muted)">g</span></div>
+      <div class="macro-bar"><div class="macro-fill" id="b-carbs" style="width:0%;background:var(--accent2)"></div></div>
+      <div class="macro-sub" id="s-carbs">/ —g</div>
+    </div>
+    <div class="macro-card">
+      <div class="macro-name">Lipides</div>
+      <div class="macro-val" id="m-fat">0<span style="font-size:11px;color:var(--muted)">g</span></div>
+      <div class="macro-bar"><div class="macro-fill" id="b-fat" style="width:0%;background:var(--accent3)"></div></div>
+      <div class="macro-sub" id="s-fat">/ —g</div>
+    </div>
+  </div>
+
+  <!-- AI FEEDBACK -->
+  <div class="ai-card" id="ai-card">
+    <div class="ai-badge">Coach IA</div>
+    <div class="ai-text" id="ai-text">Ajoute tes premiers repas pour recevoir une analyse personnalisée.</div>
+  </div>
+
+  <!-- TODAY'S MEALS -->
+  <div class="card-label" style="padding: 0 2px; margin-bottom: 8px;">REPAS DU JOUR</div>
+  <div id="meals-list">
+    <div class="empty">
+      <div class="empty-icon">🍽</div>
+      Aucun repas enregistré aujourd'hui.<br>Appuie sur + pour ajouter.
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- SCREEN: ADD MEAL -->
+
+  <div class="screen" id="screen-add">
+    <div class="header">
+      <div class="header-logo">Ajouter<span> un repas</span></div>
+    </div>
+    <div class="scroll-area">
+      <div class="add-hero">
+        <div class="add-label">Décris ton repas en texte libre</div>
+        <textarea id="meal-input" rows="4" placeholder="Ex: 200g poulet grillé + 150g riz basmati cuit + 1 filet d'huile d'olive..."></textarea>
+        <div class="examples">
+          <div class="example-chip" onclick="setExample('2 oeufs scrambled + 30g fromage blanc 0%')">🥚 2 oeufs + fromage blanc</div>
+          <div class="example-chip" onclick="setExample('200g steak haché 5% + 250g patate douce')">🥩 Steak + patate douce</div>
+          <div class="example-chip" onclick="setExample('1 scoop whey protéine + 300ml lait demi-écrémé')">🥤 Shake whey</div>
+          <div class="example-chip" onclick="setExample('80g flocons d\'avoine + 1 banane + 200ml lait végétal')">🌾 Porridge</div>
+          <div class="example-chip" onclick="setExample('150g saumon cuit + 200g brocolis + 1 cuillère huile olive')">🐟 Saumon + brocolis</div>
+        </div>
+      </div>
+
+```
+  <button class="btn-primary" id="analyze-btn" onclick="analyzeMeal()">
+    Analyser avec l'IA →
+  </button>
+
+  <div class="result-card" id="result-card">
+    <div class="ai-badge">Résultat analyse</div>
+    <div class="result-macros">
+      <div class="result-macro">
+        <div class="result-macro-val" id="r-kcal" style="color:var(--accent)">—</div>
+        <div class="result-macro-lbl">kcal</div>
+      </div>
+      <div class="result-macro">
+        <div class="result-macro-val" id="r-protein" style="color:var(--accent)">—</div>
+        <div class="result-macro-lbl">prot. g</div>
+      </div>
+      <div class="result-macro">
+        <div class="result-macro-val" id="r-carbs" style="color:var(--accent2)">—</div>
+        <div class="result-macro-lbl">gluc. g</div>
+      </div>
+      <div class="result-macro">
+        <div class="result-macro-val" id="r-fat" style="color:var(--accent3)">—</div>
+        <div class="result-macro-lbl">lip. g</div>
+      </div>
+    </div>
+    <div class="result-tip" id="r-tip"></div>
+    <button class="btn-add-confirm" id="confirm-btn" onclick="confirmMeal()">
+      ✓ Ajouter ce repas
+    </button>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- SCREEN: HISTORY -->
+
+  <div class="screen" id="screen-history">
+    <div class="header">
+      <div class="header-logo">Historique</div>
+      <div class="header-date" id="history-range">7 derniers jours</div>
+    </div>
+    <div class="scroll-area" id="history-list">
+      <div class="empty">
+        <div class="empty-icon">📅</div>
+        L'historique apparaîtra ici<br>au fil de tes journées.
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: SETTINGS -->
+
+  <div class="screen" id="screen-settings">
+    <div class="header">
+      <div class="header-logo">Paramètres</div>
+    </div>
+    <div class="scroll-area">
+      <div class="settings-section">
+        <div class="settings-title">Objectifs journaliers</div>
+        <div class="settings-row">
+          <div class="settings-item">
+            <div>
+              <div class="settings-item-label">Calories</div>
+              <div class="settings-item-sub">kcal / jour</div>
+            </div>
+            <input type="number" id="s-kcal-goal" placeholder="2000">
+          </div>
+          <div class="settings-item">
+            <div>
+              <div class="settings-item-label">Protéines</div>
+              <div class="settings-item-sub">g / jour</div>
+            </div>
+            <input type="number" id="s-protein-goal" placeholder="170">
+          </div>
+          <div class="settings-item">
+            <div>
+              <div class="settings-item-label">Glucides</div>
+              <div class="settings-item-sub">g / jour</div>
+            </div>
+            <input type="number" id="s-carbs-goal" placeholder="180">
+          </div>
+          <div class="settings-item">
+            <div>
+              <div class="settings-item-label">Lipides</div>
+              <div class="settings-item-sub">g / jour</div>
+            </div>
+            <input type="number" id="s-fat-goal" placeholder="60">
+          </div>
+        </div>
+        <button class="btn-save" onclick="saveGoals()">Enregistrer les objectifs</button>
+      </div>
+
+```
+  <div class="settings-section">
+    <div class="settings-title">Intégrations</div>
+    <div class="settings-row">
+      <div class="settings-item" style="flex-direction:column; align-items:flex-start; gap:6px;">
+        <div class="settings-item-label">Clé API Anthropic</div>
+        <input type="password" class="full" id="s-apikey" placeholder="sk-ant-...">
+      </div>
+      <div class="settings-item" style="flex-direction:column; align-items:flex-start; gap:6px;">
+        <div class="settings-item-label">Google Sheets URL</div>
+        <div class="settings-item-sub">URL de ton Apps Script web app</div>
+        <input type="text" class="full" id="s-sheets" placeholder="https://script.google.com/macros/s/...">
+      </div>
+    </div>
+    <button class="btn-save" onclick="saveIntegrations()">Enregistrer</button>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-title">Données</div>
+    <div class="settings-row">
+      <div class="settings-item" style="cursor:pointer;" onclick="exportData()">
+        <div class="settings-item-label">Exporter les données</div>
+        <span style="color:var(--muted)">→</span>
+      </div>
+      <div class="settings-item" style="cursor:pointer;" onclick="clearToday()">
+        <div class="settings-item-label" style="color:var(--accent3)">Effacer aujourd'hui</div>
+        <span style="color:var(--muted)">→</span>
+      </div>
+      <div class="settings-item" style="cursor:pointer;" onclick="resetSetup()">
+        <div class="settings-item-label" style="color:var(--danger)">Réinitialiser l'app</div>
+        <span style="color:var(--muted)">→</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; font-family:var(--font-mono); font-size:10px; color:var(--muted); padding:20px 0;">
+    NutriCoach v1.0 — Données stockées localement
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+
+  <nav class="nav">
+    <div class="nav-item active" id="nav-home" onclick="navigate('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Accueil
+    </div>
+    <div class="nav-item" id="nav-add" onclick="navigate('add')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+      </svg>
+      Ajouter
+    </div>
+    <div class="nav-item" id="nav-history" onclick="navigate('history')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+      Historique
+    </div>
+    <div class="nav-item" id="nav-settings" onclick="navigate('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+      </svg>
+      Réglages
+    </div>
+  </nav>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── STATE ──
+let state = {
+  goals: { kcal: 2000, protein: 170, carbs: 180, fat: 60 },
+  apiKey: '',
+  sheetsUrl: '',
+  todayMeals: [],
+  history: {},
+  pendingMeal: null
+};
+
+const TODAY = new Date().toISOString().split('T')[0];
+
+// ── INIT ──
+function init() {
+  loadState();
+  const isSetup = state.apiKey;
+  if (!isSetup) {
+    document.getElementById('setup-overlay').classList.remove('hidden');
+  } else {
+    document.getElementById('setup-overlay').classList.add('hidden');
+    bootApp();
+  }
+}
+
+function bootApp() {
+  setHeaderDate();
+  loadSettingsForm();
+  renderDashboard();
+  renderHistory();
+}
+
+function setHeaderDate() {
+  const d = new Date();
+  const opts = { weekday: 'long', day: 'numeric', month: 'long' };
+  document.getElementById('header-date').textContent = d.toLocaleDateString('fr-FR', opts).toUpperCase();
+}
+
+// ── STORAGE ──
+function loadState() {
+  try {
+    const saved = localStorage.getItem('nutricoach_state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state = { ...state, ...parsed };
+      // ensure todayMeals is today's
+      if (state.currentDay !== TODAY) {
+        // archive previous day
+        if (state.currentDay && state.todayMeals && state.todayMeals.length > 0) {
+          state.history[state.currentDay] = state.todayMeals;
+        }
+        state.todayMeals = [];
+        state.currentDay = TODAY;
+      }
+    } else {
+      state.currentDay = TODAY;
+    }
+  } catch(e) { state.currentDay = TODAY; }
+}
+
+function saveState() {
+  localStorage.setItem('nutricoach_state', JSON.stringify(state));
+}
+
+// ── NAVIGATION ──
+function navigate(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  document.getElementById('nav-' + screen).classList.add('active');
+  if (screen === 'history') renderHistory();
+  if (screen === 'add') {
+    document.getElementById('meal-input').value = '';
+    document.getElementById('result-card').classList.remove('show');
+    state.pendingMeal = null;
+  }
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  const meals = state.todayMeals || [];
+  const totals = meals.reduce((acc, m) => ({
+    kcal: acc.kcal + (m.kcal || 0),
+    protein: acc.protein + (m.protein || 0),
+    carbs: acc.carbs + (m.carbs || 0),
+    fat: acc.fat + (m.fat || 0)
+  }), { kcal: 0, protein: 0, carbs: 0, fat: 0 });
+
+  const g = state.goals;
+
+  // Ring
+  const pct = Math.min(totals.kcal / (g.kcal || 2000), 1);
+  const circ = 289;
+  document.getElementById('kcal-ring').style.strokeDashoffset = circ - (circ * pct);
+  document.getElementById('kcal-consumed').textContent = Math.round(totals.kcal);
+  document.getElementById('kcal-goal-display').textContent = g.kcal + ' kcal';
+  const rem = g.kcal - Math.round(totals.kcal);
+  const remEl = document.getElementById('kcal-remaining');
+  remEl.textContent = rem >= 0 ? rem + ' kcal' : '+' + Math.abs(rem) + ' kcal';
+  remEl.className = 'stat-val ' + (rem >= 0 ? 'ok' : 'warn');
+  document.getElementById('meal-count').textContent = meals.length;
+
+  // Macros
+  const macros = [
+    { id: 'protein', val: totals.protein, goal: g.protein, color: 'var(--accent)' },
+    { id: 'carbs', val: totals.carbs, goal: g.carbs, color: 'var(--accent2)' },
+    { id: 'fat', val: totals.fat, goal: g.fat, color: 'var(--accent3)' }
+  ];
+  macros.forEach(m => {
+    document.getElementById('m-' + m.id).innerHTML = Math.round(m.val) + '<span style="font-size:11px;color:var(--muted)">g</span>';
+    document.getElementById('b-' + m.id).style.width = Math.min(m.val / (m.goal || 1) * 100, 100) + '%';
+    document.getElementById('s-' + m.id).textContent = '/ ' + (m.goal || '—') + 'g';
+  });
+
+  // Meals list
+  const list = document.getElementById('meals-list');
+  if (meals.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">🍽</div>Aucun repas enregistré aujourd\'hui.<br>Appuie sur + pour ajouter.</div>';
+    return;
+  }
+  list.innerHTML = meals.map((m, i) => `
+    <div class="meal-item">
+      <div class="meal-time">${m.time}</div>
+      <div class="meal-content">
+        <div class="meal-name">${m.name}</div>
+        <div class="meal-macros">P ${m.protein}g · G ${m.carbs}g · L ${m.fat}g</div>
+      </div>
+      <div class="meal-kcal">${m.kcal}</div>
+      <button class="meal-delete" onclick="deleteMeal(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+function deleteMeal(i) {
+  state.todayMeals.splice(i, 1);
+  saveState();
+  renderDashboard();
+  toast('Repas supprimé');
+}
+
+// ── AI ANALYSIS ──
+async function analyzeMeal() {
+  const input = document.getElementById('meal-input').value.trim();
+  if (!input) { toast('Décris d\'abord ton repas'); return; }
+  if (!state.apiKey) { toast('Clé API manquante → Réglages'); return; }
+
+  const btn = document.getElementById('analyze-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+
+  try {
+    const g = state.goals;
+    const prompt = `Tu es un nutritionniste expert. Analyse ce repas et retourne UNIQUEMENT un JSON valide, sans texte avant ou après, sans markdown.
+
+Repas: "${input}"
+
+Contexte: objectif sèche — ${g.kcal} kcal/j, ${g.protein}g protéines, ${g.carbs}g glucides, ${g.fat}g lipides.
+
+Format JSON requis (valeurs arrondies à l'entier):
+{
+  "name": "Nom court du repas (max 40 car.)",
+  "kcal": 0,
+  "protein": 0,
+  "carbs": 0,
+  "fat": 0,
+  "tip": "Conseil coach court (2 phrases max), personnalisé pour la sèche"
+}`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': state.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 400,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const text = data.content[0].text.trim();
+    const clean = text.replace(/```json|```/g, '').trim();
+    const meal = JSON.parse(clean);
+
+    state.pendingMeal = { ...meal, time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) };
+
+    document.getElementById('r-kcal').textContent = meal.kcal;
+    document.getElementById('r-protein').textContent = meal.protein;
+    document.getElementById('r-carbs').textContent = meal.carbs;
+    document.getElementById('r-fat').textContent = meal.fat;
+    document.getElementById('r-tip').textContent = meal.tip || '';
+    document.getElementById('result-card').classList.add('show');
+
+  } catch(e) {
+    console.error(e);
+    toast('Erreur analyse : ' + (e.message || 'Vérifie ta clé API'));
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Analyser avec l\'IA →';
+  }
+}
+
+async function confirmMeal() {
+  if (!state.pendingMeal) return;
+  state.todayMeals.push(state.pendingMeal);
+  state.pendingMeal = null;
+
+  saveState();
+  sendToSheets(state.todayMeals[state.todayMeals.length - 1]);
+  renderDashboard();
+
+  document.getElementById('result-card').classList.remove('show');
+  document.getElementById('meal-input').value = '';
+  toast('Repas ajouté ✓');
+  navigate('home');
+  await refreshAI();
+}
+
+// ── AI DAILY FEEDBACK ──
+async function refreshAI() {
+  if (!state.apiKey || state.todayMeals.length === 0) return;
+  const g = state.goals;
+  const totals = state.todayMeals.reduce((acc, m) => ({
+    kcal: acc.kcal + m.kcal, protein: acc.protein + m.protein,
+    carbs: acc.carbs + m.carbs, fat: acc.fat + m.fat
+  }), { kcal: 0, protein: 0, carbs: 0, fat: 0 });
+
+  document.getElementById('ai-text').innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+
+  try {
+    const prompt = `Analyse rapide de la journée alimentaire pour une sèche.
+
+Consommé: ${Math.round(totals.kcal)} kcal, ${Math.round(totals.protein)}g prot, ${Math.round(totals.carbs)}g gluc, ${Math.round(totals.fat)}g lip.
+Objectifs: ${g.kcal} kcal, ${g.protein}g prot, ${g.carbs}g gluc, ${g.fat}g lip.
+Repas: ${state.todayMeals.map(m => m.name).join(', ')}.
+
+Donne un feedback coach direct en 2-3 phrases: ce qui est bien, un point à améliorer, et une recommandation concrète pour la suite de la journée si besoin.`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': state.apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    document.getElementById('ai-text').textContent = data.content[0].text;
+  } catch(e) {
+    document.getElementById('ai-text').textContent = 'Analyse temporairement indisponible.';
+  }
+}
+
+// ── SHEETS ──
+async function sendToSheets(meal) {
+  if (!state.sheetsUrl) return;
+  try {
+    await fetch(state.sheetsUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        date: TODAY,
+        meal: meal.name,
+        kcal: meal.kcal,
+        protein: meal.protein,
+        carbs: meal.carbs,
+        fat: meal.fat
+      })
+    });
+  } catch(e) { console.warn('Sheets sync failed', e); }
+}
+
+// ── HISTORY ──
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  const h = { ...state.history };
+  if (state.todayMeals.length > 0) h[TODAY] = state.todayMeals;
+
+  const days = Object.keys(h).sort().reverse().slice(0, 30);
+  if (days.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📅</div>L\'historique apparaîtra ici<br>au fil de tes journées.</div>';
+    return;
+  }
+
+  const g = state.goals;
+  el.innerHTML = days.map(day => {
+    const meals = h[day];
+    const t = meals.reduce((acc, m) => ({
+      kcal: acc.kcal + (m.kcal||0), protein: acc.protein + (m.protein||0),
+      carbs: acc.carbs + (m.carbs||0), fat: acc.fat + (m.fat||0)
+    }), { kcal: 0, protein: 0, carbs: 0, fat: 0 });
+    const pct = Math.min(t.kcal / (g.kcal || 2000) * 100, 100);
+    const d = new Date(day + 'T12:00:00');
+    const label = day === TODAY ? 'Aujourd\'hui' : d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'short' });
+    return `
+      <div class="history-day">
+        <div class="history-day-header">
+          <div class="history-day-date">${label}</div>
+          <div class="history-day-kcal">${Math.round(t.kcal)} kcal</div>
+        </div>
+        <div class="history-bar"><div class="history-bar-fill" style="width:${pct}%"></div></div>
+        <div class="history-macros">P ${Math.round(t.protein)}g · G ${Math.round(t.carbs)}g · L ${Math.round(t.fat)}g · ${meals.length} repas</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── SETTINGS ──
+function loadSettingsForm() {
+  const g = state.goals;
+  document.getElementById('s-kcal-goal').value = g.kcal || '';
+  document.getElementById('s-protein-goal').value = g.protein || '';
+  document.getElementById('s-carbs-goal').value = g.carbs || '';
+  document.getElementById('s-fat-goal').value = g.fat || '';
+  document.getElementById('s-apikey').value = state.apiKey || '';
+  document.getElementById('s-sheets').value = state.sheetsUrl || '';
+}
+
+function saveGoals() {
+  state.goals = {
+    kcal: parseInt(document.getElementById('s-kcal-goal').value) || 2000,
+    protein: parseInt(document.getElementById('s-protein-goal').value) || 170,
+    carbs: parseInt(document.getElementById('s-carbs-goal').value) || 180,
+    fat: parseInt(document.getElementById('s-fat-goal').value) || 60
+  };
+  saveState();
+  renderDashboard();
+  toast('Objectifs enregistrés ✓');
+}
+
+function saveIntegrations() {
+  state.apiKey = document.getElementById('s-apikey').value.trim();
+  state.sheetsUrl = document.getElementById('s-sheets').value.trim();
+  saveState();
+  toast('Réglages enregistrés ✓');
+}
+
+function clearToday() {
+  if (confirm('Effacer tous les repas d\'aujourd\'hui ?')) {
+    state.todayMeals = [];
+    saveState();
+    renderDashboard();
+    toast('Journée effacée');
+  }
+}
+
+function resetSetup() {
+  if (confirm('Réinitialiser complètement l\'application ?')) {
+    localStorage.removeItem('nutricoach_state');
+    location.reload();
+  }
+}
+
+function exportData() {
+  const data = JSON.stringify({ goals: state.goals, history: state.history, today: state.todayMeals }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'nutricoach-export.json'; a.click();
+}
+
+// ── SETUP ──
+function saveSetup() {
+  const apiKey = document.getElementById('setup-apikey').value.trim();
+  if (!apiKey) { toast('Clé API requise'); return; }
+
+  state.apiKey = apiKey;
+  state.sheetsUrl = document.getElementById('setup-sheets').value.trim();
+  state.goals = {
+    kcal: parseInt(document.getElementById('setup-kcal').value) || 2000,
+    protein: parseInt(document.getElementById('setup-protein').value) || 170,
+    carbs: parseInt(document.getElementById('setup-carbs').value) || 180,
+    fat: parseInt(document.getElementById('setup-fat').value) || 60
+  };
+  state.currentDay = TODAY;
+  state.todayMeals = [];
+  state.history = {};
+  saveState();
+  document.getElementById('setup-overlay').classList.add('hidden');
+  bootApp();
+}
+
+function copyScript() {
+  const code = document.getElementById('script-code').textContent;
+  navigator.clipboard.writeText(code).then(() => toast('Script copié ✓'));
+}
+
+// ── HELPERS ──
+function setExample(text) {
+  document.getElementById('meal-input').value = text;
+  document.getElementById('meal-input').focus();
+}
+
+function toast(msg, duration = 2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+// ── START ──
+init();
+</script>
+
+</body>
+</html>
