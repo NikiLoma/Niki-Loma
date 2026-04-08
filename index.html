@@ -321,13 +321,13 @@ select{width:100%;background:var(--bg);border:1px solid var(--border);border-rad
     <div class="step-wrap">
       <div class="step-box">
         <div class="step-hdr">
-          <div class="step-num">2</div>
+          <div class="step-num dim">2</div>
           <div class="step-title">Clé API Claude</div>
-          <div class="step-tag tag-req">REQUIS</div>
+          <div class="step-tag tag-opt">OPTIONNEL</div>
         </div>
         <div class="step-body">
-          <input type="password" id="s-apikey" placeholder="sk-ant-••••••••">
-          <div class="step-hint">→ console.anthropic.com › API Keys</div>
+          <input type="password" id="s-apikey" placeholder="sk-ant-... (optionnel)">
+          <div class="step-hint">→ console.anthropic.com › API Keys<br>Sans clé : saisie manuelle dispo, analyse IA désactivée</div>
         </div>
       </div>
     </div>
@@ -460,6 +460,17 @@ select{width:100%;background:var(--bg);border:1px solid var(--border);border-rad
           </div>
         </div>
         <button class="btn-primary" id="analyze-btn-text" onclick="analyzeText()">Analyser avec l'IA →</button>
+        <div id="manual-entry" style="margin-top:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:none;">
+          <div class="card-label" style="margin-bottom:10px;">Saisie manuelle des macros</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div><label style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;display:block;margin-bottom:4px;">NOM DU REPAS</label><input type="text" id="manual-name" placeholder="Ex: Poulet riz"></div>
+            <div><label style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;display:block;margin-bottom:4px;">CALORIES</label><input type="number" id="manual-kcal" placeholder="500"></div>
+            <div><label style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;display:block;margin-bottom:4px;">PROTÉINES (g)</label><input type="number" id="manual-protein" placeholder="40"></div>
+            <div><label style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;display:block;margin-bottom:4px;">GLUCIDES (g)</label><input type="number" id="manual-carbs" placeholder="60"></div>
+            <div><label style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;display:block;margin-bottom:4px;">LIPIDES (g)</label><input type="number" id="manual-fat" placeholder="15"></div>
+          </div>
+          <button class="btn-secondary" style="margin-top:0;" onclick="addManual()">Ajouter ce repas</button>
+        </div>
       </div>
 
       <!-- PHOTO -->
@@ -642,7 +653,7 @@ function showSetup(){
 function showApp(){
   document.getElementById('setup-screen').classList.remove('active');
   document.getElementById('app').classList.add('active');
-  setHeaderDate();loadSettingsForm();renderDashboard();renderWeightScreen();
+  setHeaderDate();loadSettingsForm();renderDashboard();renderWeightScreen();updateUIForApiKey();
 }
 
 function loadState(){
@@ -720,7 +731,7 @@ function saveSetup(){
   var age=parseInt(document.getElementById('s-age').value);
   var h=parseFloat(document.getElementById('s-height').value);
   var w=parseFloat(document.getElementById('s-weight').value);
-  if(!apiKey){toast('Clé API requise');return;}
+  // API key optional
   if(!name||!age||!h||!w){toast('Complète ton profil');return;}
   state.apiKey=apiKey;
   state.sheetsUrl=document.getElementById('s-sheets').value.trim();
@@ -750,6 +761,7 @@ function navigate(screen){
     document.getElementById('photo-drop').style.display='block';
     document.getElementById('analyze-btn-photo').disabled=true;
     state.pendingMeal=null;
+    updateUIForApiKey();
   }
   if(screen==='settings')loadSettingsForm();
   if(screen==='weight')renderWeightScreen();
@@ -815,7 +827,11 @@ function setEx(t){document.getElementById('meal-input').value=t;}
 function analyzeText(){
   var input=document.getElementById('meal-input').value.trim();
   if(!input){toast('Décris ton repas');return;}
-  if(!state.apiKey){toast('Clé API manquante');return;}
+  if(!state.apiKey){
+    toast('Clé API requise pour l\'analyse IA');
+    document.getElementById('r-tip').textContent='Ajoute ta clé API dans Réglages pour activer l\'analyse IA.';
+    return;
+  }
   var btn=document.getElementById('analyze-btn-text');
   btn.disabled=true;btn.innerHTML='<span class="loading-dots"><span></span><span></span><span></span></span>';
   var g=state.goals;
@@ -847,7 +863,7 @@ function handlePhoto(e){
 
 function analyzePhoto(){
   if(!currentPhotoB64){toast('Sélectionne une photo');return;}
-  if(!state.apiKey){toast('Clé API manquante');return;}
+  if(!state.apiKey){toast('Clé API requise pour l\'analyse photo');return;}
   var btn=document.getElementById('analyze-btn-photo');
   btn.disabled=true;btn.innerHTML='<span class="loading-dots"><span></span><span></span><span></span></span>';
   var g=state.goals;
@@ -915,7 +931,11 @@ function addSport(){
 }
 
 function refreshAI(){
-  if(!state.apiKey||!state.todayMeals.length)return;
+  if(!state.apiKey){
+    document.getElementById('ai-text').textContent='Ajoute ta clé API dans Réglages pour activer le coaching IA personnalisé.';
+    return;
+  }
+  if(!state.todayMeals.length)return;
   var meals=state.todayMeals.filter(function(m){return m.type!=='sport';});
   if(!meals.length)return;
   var t=meals.reduce(function(a,m){return {kcal:a.kcal+m.kcal,protein:a.protein+m.protein,carbs:a.carbs+m.carbs,fat:a.fat+m.fat};},{kcal:0,protein:0,carbs:0,fat:0});
@@ -1057,7 +1077,7 @@ function saveGoals(){
 function saveIntegrations(){
   state.apiKey=document.getElementById('cfg-apikey').value.trim();
   state.sheetsUrl=document.getElementById('cfg-sheets').value.trim();
-  saveState();toast('Réglages enregistrés ✓');
+  saveState();updateUIForApiKey();toast('Réglages enregistrés ✓');
 }
 
 function clearToday(){if(confirm('Effacer tous les repas d\'aujourd\'hui ?')){state.todayMeals=[];saveState();renderDashboard();toast('Journée effacée');}}
@@ -1101,6 +1121,41 @@ function toast(msg){
   var el=document.getElementById('toast');
   el.textContent=msg;el.classList.add('show');
   setTimeout(function(){el.classList.remove('show');},2500);
+}
+
+function addManual(){
+  var name=document.getElementById('manual-name').value.trim();
+  var kcal=parseInt(document.getElementById('manual-kcal').value)||0;
+  var protein=parseInt(document.getElementById('manual-protein').value)||0;
+  var carbs=parseInt(document.getElementById('manual-carbs').value)||0;
+  var fat=parseInt(document.getElementById('manual-fat').value)||0;
+  if(!name||!kcal){toast('Nom et calories requis');return;}
+  state.todayMeals.push({name:name,kcal:kcal,protein:protein,carbs:carbs,fat:fat,time:new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
+  saveState();renderDashboard();
+  document.getElementById('manual-name').value='';
+  document.getElementById('manual-kcal').value='';
+  document.getElementById('manual-protein').value='';
+  document.getElementById('manual-carbs').value='';
+  document.getElementById('manual-fat').value='';
+  document.getElementById('meal-input').value='';
+  toast('Repas ajouté ✓');navigate('home');
+}
+
+function updateUIForApiKey(){
+  var hasKey=!!state.apiKey;
+  var btn=document.getElementById('analyze-btn-text');
+  var manual=document.getElementById('manual-entry');
+  if(btn){
+    btn.style.display=hasKey?'block':'none';
+  }
+  if(manual){
+    manual.style.display=hasKey?'none':'block';
+  }
+  var photoBtn=document.getElementById('analyze-btn-photo');
+  if(photoBtn&&!hasKey){
+    photoBtn.textContent='Clé API requise pour la photo';
+    photoBtn.disabled=true;
+  }
 }
 
 updateSportCal();
