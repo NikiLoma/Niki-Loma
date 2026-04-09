@@ -259,6 +259,9 @@ select{width:100%;background:var(--bg);border:1px solid var(--border);border-rad
 .empty-icon{font-size:28px;margin-bottom:8px;}
 .section-title{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding:0 2px;}
 .script-box{background:var(--bg2);border-radius:8px;padding:10px;margin-top:8px;font-family:var(--mono);font-size:8px;color:var(--text2);line-height:1.8;white-space:pre-wrap;cursor:pointer;border:1px solid var(--border);}
+.ai-prov-btn{flex:1;padding:10px 6px;border-radius:10px;background:var(--bg);border:1.5px solid var(--border);text-align:center;cursor:pointer;transition:all 0.15s;}
+.ai-prov-btn.sel{background:#eef6e4;border-color:var(--green);}
+.ai-prov-btn:active{opacity:0.8;}
 ::-webkit-scrollbar{width:0;}
 </style>
 </head>
@@ -322,12 +325,30 @@ select{width:100%;background:var(--bg);border:1px solid var(--border);border-rad
       <div class="step-box">
         <div class="step-hdr">
           <div class="step-num dim">2</div>
-          <div class="step-title">Clé API Claude</div>
+          <div class="step-title">Intelligence Artificielle</div>
           <div class="step-tag tag-opt">OPTIONNEL</div>
         </div>
         <div class="step-body">
+          <label style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px;">Fournisseur IA</label>
+          <div style="display:flex;gap:6px;margin-bottom:10px;" id="setup-ai-providers">
+            <div class="ai-prov-btn sel" data-prov="claude" onclick="selectProvider(this,'setup')">
+              <div style="font-size:16px;margin-bottom:2px;">🤖</div>
+              <div style="font-size:10px;font-weight:600;">Claude</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">Anthropic</div>
+            </div>
+            <div class="ai-prov-btn" data-prov="openai" onclick="selectProvider(this,'setup')">
+              <div style="font-size:16px;margin-bottom:2px;">⚡</div>
+              <div style="font-size:10px;font-weight:600;">GPT-4o</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">OpenAI</div>
+            </div>
+            <div class="ai-prov-btn" data-prov="gemini" onclick="selectProvider(this,'setup')">
+              <div style="font-size:16px;margin-bottom:2px;">✨</div>
+              <div style="font-size:10px;font-weight:600;">Gemini</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">Google</div>
+            </div>
+          </div>
           <input type="password" id="s-apikey" placeholder="sk-ant-... (optionnel)">
-          <div class="step-hint">→ console.anthropic.com › API Keys<br>Sans clé : saisie manuelle dispo, analyse IA désactivée</div>
+          <div class="step-hint" id="setup-api-hint">→ console.anthropic.com › API Keys<br>Sans clé : saisie manuelle dispo, analyse IA désactivée</div>
         </div>
       </div>
     </div>
@@ -587,12 +608,45 @@ select{width:100%;background:var(--bg);border:1px solid var(--border);border-rad
         <button class="btn-secondary" onclick="saveGoals()">Enregistrer les objectifs</button>
       </div>
       <div class="settings-section">
-        <div class="settings-section-title">Intégrations</div>
+        <div class="settings-section-title">Intelligence Artificielle</div>
         <div class="settings-group">
-          <div class="settings-item si-full"><div class="si-label">Clé API Anthropic</div><input type="password" id="cfg-apikey" placeholder="sk-ant-..."></div>
-          <div class="settings-item si-full"><div class="si-label">Google Sheets URL</div><div class="si-sub">Apps Script web app</div><input type="text" id="cfg-sheets" placeholder="https://script.google.com/..."></div>
+          <div class="settings-item" style="flex-direction:column;align-items:flex-start;gap:10px;padding:14px;">
+            <div class="si-label">Fournisseur IA</div>
+            <div style="display:flex;gap:6px;width:100%;" id="cfg-ai-providers">
+              <div class="ai-prov-btn" data-prov="claude" onclick="selectProvider(this,'cfg')">
+                <div style="font-size:16px;margin-bottom:2px;">🤖</div>
+                <div style="font-size:10px;font-weight:600;">Claude</div>
+                <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">Anthropic</div>
+              </div>
+              <div class="ai-prov-btn" data-prov="openai" onclick="selectProvider(this,'cfg')">
+                <div style="font-size:16px;margin-bottom:2px;">⚡</div>
+                <div style="font-size:10px;font-weight:600;">GPT-4o</div>
+                <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">OpenAI</div>
+              </div>
+              <div class="ai-prov-btn" data-prov="gemini" onclick="selectProvider(this,'cfg')">
+                <div style="font-size:16px;margin-bottom:2px;">✨</div>
+                <div style="font-size:10px;font-weight:600;">Gemini</div>
+                <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">Google</div>
+              </div>
+            </div>
+          </div>
+          <div class="settings-item si-full">
+            <div class="si-label">Clé API</div>
+            <div class="si-sub" id="cfg-api-hint">console.anthropic.com › API Keys</div>
+            <input type="password" id="cfg-apikey" placeholder="Clé API...">
+          </div>
         </div>
         <button class="btn-secondary" onclick="saveIntegrations()">Enregistrer</button>
+      </div>
+      <div class="settings-section">
+        <div class="settings-section-title">Google Sheets</div>
+        <div class="settings-group">
+          <div class="settings-item si-full">
+            <div class="si-label">URL Apps Script</div>
+            <input type="text" id="cfg-sheets" placeholder="https://script.google.com/...">
+          </div>
+        </div>
+        <button class="btn-secondary" onclick="saveSheets()">Enregistrer</button>
       </div>
       <div class="settings-section">
         <div class="settings-section-title">Données</div>
@@ -638,11 +692,19 @@ var TODAY = new Date().toISOString().split('T')[0];
 var state = {
   profile:{name:'',age:0,height:0,weight:0,gender:'H',objective:'seche',activity:1.55,targetWeight:0},
   goals:{kcal:2000,protein:170,carbs:180,fat:60},
-  apiKey:'',sheetsUrl:'',todayMeals:[],history:{},weightLog:[],
+  apiKey:'',sheetsUrl:'',aiProvider:'claude',configured:false,todayMeals:[],history:{},weightLog:[],
   currentDay:TODAY,pendingMeal:null,selectedSport:{name:'Musculation',met:6}
 };
 
-function init(){loadState();if(!state.apiKey){showSetup();}else{showApp();}}
+function init(){
+  loadState();
+  // Use explicit flag — not dependent on profile fields being filled
+  if(!state.configured){
+    showSetup();
+  } else {
+    showApp();
+  }
+}
 
 function showSetup(){
   document.getElementById('setup-screen').classList.add('active');
@@ -658,30 +720,53 @@ function showApp(){
 
 function loadState(){
   try{
-    var s=localStorage.getItem('nc_v3');
-    if(s){
-      var p=JSON.parse(s);
-      state.profile=p.profile||state.profile;
-      state.goals=p.goals||state.goals;
-      state.apiKey=p.apiKey||'';
-      state.sheetsUrl=p.sheetsUrl||'';
-      state.history=p.history||{};
-      state.weightLog=p.weightLog||[];
-      if(p.currentDay!==TODAY){
-        if(p.currentDay&&p.todayMeals&&p.todayMeals.length>0)state.history[p.currentDay]=p.todayMeals;
-        state.todayMeals=[];state.currentDay=TODAY;
-      }else{state.todayMeals=p.todayMeals||[];state.currentDay=TODAY;}
+    // Try all known storage keys (handles version migrations)
+    var raw = localStorage.getItem('nc_v6')
+           || localStorage.getItem('nc_v5')
+           || localStorage.getItem('nc_v3');
+    if(raw){
+      var p=JSON.parse(raw);
+      state.configured = p.configured || false;
+      state.profile = p.profile || state.profile;
+      state.goals = p.goals || state.goals;
+      state.apiKey = p.apiKey || '';
+      state.sheetsUrl = p.sheetsUrl || '';
+      state.aiProvider = p.aiProvider || 'claude';
+      state.history = p.history || {};
+      state.weightLog = p.weightLog || [];
+      if(p.currentDay !== TODAY){
+        if(p.currentDay && p.todayMeals && p.todayMeals.length > 0){
+          state.history[p.currentDay] = p.todayMeals;
+        }
+        state.todayMeals = [];
+        state.currentDay = TODAY;
+      } else {
+        state.todayMeals = p.todayMeals || [];
+        state.currentDay = TODAY;
+      }
+      // If old save had profile filled but no configured flag — treat as configured
+      if(!state.configured && p.profile && p.profile.name){
+        state.configured = true;
+      }
     }
-  }catch(e){}
+  }catch(e){ console.error('loadState error:', e); }
 }
 
 function saveState(){
   try{
-    localStorage.setItem('nc_v3',JSON.stringify({
-      profile:state.profile,goals:state.goals,apiKey:state.apiKey,sheetsUrl:state.sheetsUrl,
-      todayMeals:state.todayMeals,history:state.history,weightLog:state.weightLog,currentDay:state.currentDay
+    localStorage.setItem('nc_v6', JSON.stringify({
+      configured: state.configured,
+      profile: state.profile,
+      goals: state.goals,
+      apiKey: state.apiKey,
+      sheetsUrl: state.sheetsUrl,
+      aiProvider: state.aiProvider,
+      todayMeals: state.todayMeals,
+      history: state.history,
+      weightLog: state.weightLog,
+      currentDay: state.currentDay
     }));
-  }catch(e){}
+  }catch(e){ console.error('saveState error:', e); }
 }
 
 var selGender='H',selObj='seche';
@@ -735,6 +820,7 @@ function saveSetup(){
   if(!name||!age||!h||!w){toast('Complète ton profil');return;}
   state.apiKey=apiKey;
   state.sheetsUrl=document.getElementById('s-sheets').value.trim();
+  // aiProvider already set via selectProvider
   state.profile={name:name,age:age,height:h,weight:w,gender:selGender,objective:selObj,activity:parseFloat(document.getElementById('s-activity').value)||1.55,targetWeight:0};
   var bmr=selGender==='H'?10*w+6.25*h-5*age+5:10*w+6.25*h-5*age-161;
   var tdee=bmr*state.profile.activity;
@@ -743,6 +829,7 @@ function saveSetup(){
   var fat=Math.round(kcal*0.25/9);
   var carbs=Math.max(0,Math.round((kcal-protein*4-fat*9)/4));
   state.goals={kcal:kcal,protein:protein,carbs:carbs,fat:fat};
+  state.configured = true;
   state.todayMeals=[];state.history={};state.currentDay=TODAY;
   saveState();showApp();
 }
@@ -1053,6 +1140,7 @@ function loadSettingsForm(){
   document.getElementById('cfg-fat').value=g.fat||'';
   document.getElementById('cfg-apikey').value=state.apiKey||'';
   document.getElementById('cfg-sheets').value=state.sheetsUrl||'';
+  loadSettingsProviderUI();
 }
 
 function saveProfile(){
@@ -1076,12 +1164,11 @@ function saveGoals(){
 
 function saveIntegrations(){
   state.apiKey=document.getElementById('cfg-apikey').value.trim();
-  state.sheetsUrl=document.getElementById('cfg-sheets').value.trim();
-  saveState();updateUIForApiKey();toast('Réglages enregistrés ✓');
+  saveState();updateUIForApiKey();toast('Réglages IA enregistrés ✓');
 }
 
 function clearToday(){if(confirm('Effacer tous les repas d\'aujourd\'hui ?')){state.todayMeals=[];saveState();renderDashboard();toast('Journée effacée');}}
-function resetApp(){if(confirm('Réinitialiser complètement l\'application ?')){localStorage.removeItem('nc_v3');location.reload();}}
+function resetApp(){if(confirm('Réinitialiser complètement l'application ?')){['nc_v6','nc_v5','nc_v3'].forEach(function(k){localStorage.removeItem(k);});location.reload();}}
 
 function exportData(){
   var data=JSON.stringify({profile:state.profile,goals:state.goals,history:state.history,weightLog:state.weightLog,today:state.todayMeals},null,2);
@@ -1099,18 +1186,6 @@ function sendToSheets(meal){
   }).catch(function(){});
 }
 
-function callClaude(messages){
-  return fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:600,messages:messages})
-  })
-  .then(function(r){return r.json();})
-  .then(function(d){
-    if(d.error)throw new Error(d.error.message);
-    return d.content.map(function(c){return c.type==='text'?c.text:'';}).join('');
-  });
-}
 
 function copyScript(){
   var code=document.querySelector('.script-box').textContent;
@@ -1122,6 +1197,109 @@ function toast(msg){
   el.textContent=msg;el.classList.add('show');
   setTimeout(function(){el.classList.remove('show');},2500);
 }
+
+var PROVIDER_HINTS={
+  claude:'console.anthropic.com › API Keys',
+  openai:'platform.openai.com › API Keys',
+  gemini:'aistudio.google.com › API Keys'
+};
+var PROVIDER_PLACEHOLDERS={
+  claude:'sk-ant-...',
+  openai:'sk-...',
+  gemini:'AIza...'
+};
+
+function selectProvider(el,ctx){
+  var prov=el.dataset.prov;
+  state.aiProvider=prov;
+  var containerId=ctx==='setup'?'setup-ai-providers':'cfg-ai-providers';
+  document.querySelectorAll('#'+containerId+' .ai-prov-btn').forEach(function(b){b.classList.remove('sel');});
+  el.classList.add('sel');
+  var hintId=ctx==='setup'?'setup-api-hint':'cfg-api-hint';
+  var inputId=ctx==='setup'?'s-apikey':'cfg-apikey';
+  var hintEl=document.getElementById(hintId);
+  var inputEl=document.getElementById(inputId);
+  if(hintEl)hintEl.textContent=PROVIDER_HINTS[prov]||'';
+  if(inputEl)inputEl.placeholder=PROVIDER_PLACEHOLDERS[prov]||'Clé API...';
+}
+
+function loadSettingsProviderUI(){
+  var prov=state.aiProvider||'claude';
+  document.querySelectorAll('#cfg-ai-providers .ai-prov-btn').forEach(function(b){
+    b.classList.toggle('sel',b.dataset.prov===prov);
+  });
+  var hintEl=document.getElementById('cfg-api-hint');
+  var inputEl=document.getElementById('cfg-apikey');
+  if(hintEl)hintEl.textContent=PROVIDER_HINTS[prov]||'';
+  if(inputEl)inputEl.placeholder=PROVIDER_PLACEHOLDERS[prov]||'Clé API...';
+}
+
+function saveSheets(){
+  state.sheetsUrl=document.getElementById('cfg-sheets').value.trim();
+  saveState();toast('Google Sheets enregistré ✓');
+}
+
+function callAI(messages){
+  var prov=state.aiProvider||'claude';
+  if(prov==='claude'){
+    return fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:600,messages:messages})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error)throw new Error(d.error.message);
+      return d.content.map(function(c){return c.type==='text'?c.text:'';}).join('');
+    });
+  }
+  if(prov==='openai'){
+    var oaiMessages=messages.map(function(m){
+      if(typeof m.content==='string')return {role:m.role,content:m.content};
+      var parts=m.content.map(function(p){
+        if(p.type==='text')return {type:'text',text:p.text};
+        if(p.type==='image')return {type:'image_url',image_url:{url:'data:'+p.source.media_type+';base64,'+p.source.data}};
+        return p;
+      });
+      return {role:m.role,content:parts};
+    });
+    return fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+state.apiKey},
+      body:JSON.stringify({model:'gpt-4o',max_tokens:600,messages:oaiMessages})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error)throw new Error(d.error.message);
+      return d.choices[0].message.content;
+    });
+  }
+  if(prov==='gemini'){
+    var gemParts=[];
+    messages.forEach(function(m){
+      if(typeof m.content==='string'){gemParts.push({text:m.content});}
+      else{
+        m.content.forEach(function(p){
+          if(p.type==='text')gemParts.push({text:p.text});
+          if(p.type==='image')gemParts.push({inlineData:{mimeType:p.source.media_type,data:p.source.data}});
+        });
+      }
+    });
+    return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+state.apiKey,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:gemParts}]})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error)throw new Error(d.error.message||d.error.status);
+      return d.candidates[0].content.parts[0].text;
+    });
+  }
+  return Promise.reject(new Error('Fournisseur IA inconnu'));
+}
+
+function callClaude(messages){return callAI(messages);}
 
 function addManual(){
   var name=document.getElementById('manual-name').value.trim();
