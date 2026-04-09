@@ -331,7 +331,12 @@ select{width:100%;background:var(--bg);border:1px solid var(--border);border-rad
         <div class="step-body">
           <label style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px;">Fournisseur IA</label>
           <div style="display:flex;gap:6px;margin-bottom:10px;" id="setup-ai-providers">
-            <div class="ai-prov-btn sel" data-prov="claude" onclick="selectProvider(this,'setup')">
+            <div class="ai-prov-btn sel" data-prov="openrouter" onclick="selectProvider(this,'setup')">
+              <div style="font-size:16px;margin-bottom:2px;">🔀</div>
+              <div style="font-size:10px;font-weight:600;">OpenRouter</div>
+              <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">Multi-modèles</div>
+            </div>
+            <div class="ai-prov-btn" data-prov="claude" onclick="selectProvider(this,'setup')">
               <div style="font-size:16px;margin-bottom:2px;">🤖</div>
               <div style="font-size:10px;font-weight:600;">Claude</div>
               <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">Anthropic</div>
@@ -347,8 +352,22 @@ select{width:100%;background:var(--bg);border:1px solid var(--border);border-rad
               <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">Google</div>
             </div>
           </div>
-          <input type="password" id="s-apikey" placeholder="sk-ant-... (optionnel)">
-          <div class="step-hint" id="setup-api-hint">→ console.anthropic.com › API Keys<br>Sans clé : saisie manuelle dispo, analyse IA désactivée</div>
+          <input type="password" id="s-apikey" placeholder="sk-or-v1-... (optionnel)">
+          <div class="step-hint" id="setup-api-hint">→ openrouter.ai › Keys — Accès à tous les modèles</div>
+          <div id="setup-model-wrap" style="margin-top:8px;">
+            <label style="font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:5px;">Modèle</label>
+            <select id="s-model" onchange="state.aiModel=this.value;">
+              <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (GRATUIT)</option>
+              <option value="google/gemini-2.5-flash-preview:free">Gemini 2.5 Flash (GRATUIT)</option>
+              <option value="meta-llama/llama-4-scout:free">Llama 4 Scout (GRATUIT)</option>
+              <option value="mistralai/mistral-small-3.1-24b-instruct:free">Mistral Small 3.1 (GRATUIT)</option>
+              <option value="anthropic/claude-haiku-4-5">Claude Haiku (payant)</option>
+              <option value="anthropic/claude-sonnet-4-5">Claude Sonnet (payant)</option>
+              <option value="openai/gpt-4o-mini">GPT-4o Mini (payant)</option>
+              <option value="openai/gpt-4o">GPT-4o (payant)</option>
+              <option value="google/gemini-2.5-pro-preview">Gemini 2.5 Pro (payant)</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -611,8 +630,13 @@ select{width:100%;background:var(--bg);border:1px solid var(--border);border-rad
         <div class="settings-section-title">Intelligence Artificielle</div>
         <div class="settings-group">
           <div class="settings-item" style="flex-direction:column;align-items:flex-start;gap:10px;padding:14px;">
-            <div class="si-label">Fournisseur IA</div>
-            <div style="display:flex;gap:6px;width:100%;" id="cfg-ai-providers">
+            <div class="si-label">Fournisseur</div>
+            <div style="display:flex;gap:6px;width:100%;flex-wrap:wrap;" id="cfg-ai-providers">
+              <div class="ai-prov-btn" data-prov="openrouter" onclick="selectProvider(this,'cfg')">
+                <div style="font-size:16px;margin-bottom:2px;">🔀</div>
+                <div style="font-size:10px;font-weight:600;">OpenRouter</div>
+                <div style="font-family:var(--mono);font-size:7px;color:var(--muted);">Multi-modèles</div>
+              </div>
               <div class="ai-prov-btn" data-prov="claude" onclick="selectProvider(this,'cfg')">
                 <div style="font-size:16px;margin-bottom:2px;">🤖</div>
                 <div style="font-size:10px;font-weight:600;">Claude</div>
@@ -630,10 +654,24 @@ select{width:100%;background:var(--bg);border:1px solid var(--border);border-rad
               </div>
             </div>
           </div>
+          <div class="settings-item" style="flex-direction:column;align-items:flex-start;gap:6px;" id="cfg-model-wrap">
+            <div class="si-label">Modèle</div>
+            <select id="cfg-model" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font);font-size:13px;padding:10px 12px;outline:none;" onchange="state.aiModel=this.value;saveState();">
+              <option value="google/gemini-2.0-flash-exp:free">Gemini 2.0 Flash (GRATUIT)</option>
+              <option value="google/gemini-2.5-flash-preview:free">Gemini 2.5 Flash (GRATUIT)</option>
+              <option value="meta-llama/llama-4-scout:free">Llama 4 Scout (GRATUIT)</option>
+              <option value="mistralai/mistral-small-3.1-24b-instruct:free">Mistral Small 3.1 (GRATUIT)</option>
+              <option value="anthropic/claude-haiku-4-5">Claude Haiku (payant)</option>
+              <option value="anthropic/claude-sonnet-4-5">Claude Sonnet (payant)</option>
+              <option value="openai/gpt-4o-mini">GPT-4o Mini (payant)</option>
+              <option value="openai/gpt-4o">GPT-4o (payant)</option>
+              <option value="google/gemini-2.5-pro-preview">Gemini 2.5 Pro (payant)</option>
+            </select>
+          </div>
           <div class="settings-item si-full">
             <div class="si-label">Clé API</div>
-            <div class="si-sub" id="cfg-api-hint">console.anthropic.com › API Keys</div>
-            <input type="password" id="cfg-apikey" placeholder="Clé API...">
+            <div class="si-sub" id="cfg-api-hint">openrouter.ai → Keys</div>
+            <input type="password" id="cfg-apikey" placeholder="sk-or-v1-...">
           </div>
         </div>
         <button class="btn-secondary" onclick="saveIntegrations()">Enregistrer</button>
@@ -692,7 +730,7 @@ var TODAY = new Date().toISOString().split('T')[0];
 var state = {
   profile:{name:'',age:0,height:0,weight:0,gender:'H',objective:'seche',activity:1.55,targetWeight:0},
   goals:{kcal:2000,protein:170,carbs:180,fat:60},
-  apiKey:'',sheetsUrl:'',aiProvider:'claude',configured:false,todayMeals:[],history:{},weightLog:[],
+  apiKey:'',sheetsUrl:'',aiProvider:'openrouter',aiModel:'google/gemini-2.0-flash-exp:free',configured:false,todayMeals:[],history:{},weightLog:[],
   currentDay:TODAY,pendingMeal:null,selectedSport:{name:'Musculation',met:6}
 };
 
@@ -721,7 +759,7 @@ function showApp(){
 function loadState(){
   try{
     // Try all known storage keys (handles version migrations)
-    var raw = localStorage.getItem('nc_v6')
+    var raw = localStorage.getItem('nc_v7')
            || localStorage.getItem('nc_v5')
            || localStorage.getItem('nc_v3');
     if(raw){
@@ -731,7 +769,8 @@ function loadState(){
       state.goals = p.goals || state.goals;
       state.apiKey = p.apiKey || '';
       state.sheetsUrl = p.sheetsUrl || '';
-      state.aiProvider = p.aiProvider || 'claude';
+      state.aiProvider = p.aiProvider || 'openrouter';
+      state.aiModel = p.aiModel || 'google/gemini-2.0-flash-exp:free';
       state.history = p.history || {};
       state.weightLog = p.weightLog || [];
       if(p.currentDay !== TODAY){
@@ -754,13 +793,14 @@ function loadState(){
 
 function saveState(){
   try{
-    localStorage.setItem('nc_v6', JSON.stringify({
+    localStorage.setItem('nc_v7', JSON.stringify({
       configured: state.configured,
       profile: state.profile,
       goals: state.goals,
       apiKey: state.apiKey,
       sheetsUrl: state.sheetsUrl,
       aiProvider: state.aiProvider,
+      aiModel: state.aiModel,
       todayMeals: state.todayMeals,
       history: state.history,
       weightLog: state.weightLog,
@@ -821,6 +861,9 @@ function saveSetup(){
   state.apiKey=apiKey;
   state.sheetsUrl=document.getElementById('s-sheets').value.trim();
   // aiProvider already set via selectProvider
+  // sync model from setup selector
+  var sModel=document.getElementById('s-model');
+  if(sModel)state.aiModel=sModel.value;
   state.profile={name:name,age:age,height:h,weight:w,gender:selGender,objective:selObj,activity:parseFloat(document.getElementById('s-activity').value)||1.55,targetWeight:0};
   var bmr=selGender==='H'?10*w+6.25*h-5*age+5:10*w+6.25*h-5*age-161;
   var tdee=bmr*state.profile.activity;
@@ -1164,11 +1207,13 @@ function saveGoals(){
 
 function saveIntegrations(){
   state.apiKey=document.getElementById('cfg-apikey').value.trim();
+  var modelSel=document.getElementById('cfg-model');
+  if(modelSel)state.aiModel=modelSel.value;
   saveState();updateUIForApiKey();toast('Réglages IA enregistrés ✓');
 }
 
 function clearToday(){if(confirm('Effacer tous les repas d\'aujourd\'hui ?')){state.todayMeals=[];saveState();renderDashboard();toast('Journée effacée');}}
-function resetApp(){if(confirm('Réinitialiser complètement l\u0027application ?')){['nc_v6','nc_v5','nc_v3'].forEach(function(k){localStorage.removeItem(k);});location.reload();}}
+function resetApp(){if(confirm('Réinitialiser complètement l\u0027application ?')){['nc_v7','nc_v6','nc_v5','nc_v3'].forEach(function(k){localStorage.removeItem(k);});location.reload();}}
 
 function exportData(){
   var data=JSON.stringify({profile:state.profile,goals:state.goals,history:state.history,weightLog:state.weightLog,today:state.todayMeals},null,2);
@@ -1199,11 +1244,13 @@ function toast(msg){
 }
 
 var PROVIDER_HINTS={
+  openrouter:'openrouter.ai › Keys — Accès à tous les modèles',
   claude:'console.anthropic.com › API Keys',
   openai:'platform.openai.com › API Keys',
   gemini:'aistudio.google.com › API Keys'
 };
 var PROVIDER_PLACEHOLDERS={
+  openrouter:'sk-or-v1-...',
   claude:'sk-ant-...',
   openai:'sk-...',
   gemini:'AIza...'
@@ -1217,21 +1264,29 @@ function selectProvider(el,ctx){
   el.classList.add('sel');
   var hintId=ctx==='setup'?'setup-api-hint':'cfg-api-hint';
   var inputId=ctx==='setup'?'s-apikey':'cfg-apikey';
+  var modelWrapId=ctx==='setup'?'setup-model-wrap':'cfg-model-wrap';
   var hintEl=document.getElementById(hintId);
   var inputEl=document.getElementById(inputId);
+  var modelWrap=document.getElementById(modelWrapId);
   if(hintEl)hintEl.textContent=PROVIDER_HINTS[prov]||'';
   if(inputEl)inputEl.placeholder=PROVIDER_PLACEHOLDERS[prov]||'Clé API...';
+  // Show model selector only for OpenRouter
+  if(modelWrap)modelWrap.style.display=prov==='openrouter'?'':'none';
 }
 
 function loadSettingsProviderUI(){
-  var prov=state.aiProvider||'claude';
+  var prov=state.aiProvider||'openrouter';
   document.querySelectorAll('#cfg-ai-providers .ai-prov-btn').forEach(function(b){
     b.classList.toggle('sel',b.dataset.prov===prov);
   });
   var hintEl=document.getElementById('cfg-api-hint');
   var inputEl=document.getElementById('cfg-apikey');
+  var modelWrap=document.getElementById('cfg-model-wrap');
+  var modelSel=document.getElementById('cfg-model');
   if(hintEl)hintEl.textContent=PROVIDER_HINTS[prov]||'';
   if(inputEl)inputEl.placeholder=PROVIDER_PLACEHOLDERS[prov]||'Clé API...';
+  if(modelWrap)modelWrap.style.display=prov==='openrouter'?'':'none';
+  if(modelSel&&state.aiModel)modelSel.value=state.aiModel;
 }
 
 function saveSheets(){
@@ -1240,11 +1295,42 @@ function saveSheets(){
 }
 
 function callAI(messages){
-  var prov=state.aiProvider||'claude';
+  var prov=state.aiProvider||'openrouter';
+  var key=state.apiKey;
+  if(!key)return Promise.reject(new Error('Clé API manquante'));
+
+  if(prov==='openrouter'){
+    var model=state.aiModel||'google/gemini-2.0-flash-exp:free';
+    var orMessages=messages.map(function(m){
+      if(typeof m.content==='string')return {role:m.role,content:m.content};
+      var parts=m.content.map(function(p){
+        if(p.type==='text')return {type:'text',text:p.text};
+        if(p.type==='image')return {type:'image_url',image_url:{url:'data:'+p.source.media_type+';base64,'+p.source.data}};
+        return p;
+      });
+      return {role:m.role,content:parts};
+    });
+    return fetch('https://openrouter.ai/api/v1/chat/completions',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+key,
+        'HTTP-Referer':'https://nikiloma.github.io',
+        'X-Title':'NutriCoach'
+      },
+      body:JSON.stringify({model:model,max_tokens:600,messages:orMessages})
+    })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.error)throw new Error(d.error.message||JSON.stringify(d.error));
+      if(!d.choices||!d.choices[0])throw new Error('Réponse OpenRouter vide');
+      return d.choices[0].message.content;
+    });
+  }
   if(prov==='claude'){
     return fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':state.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:600,messages:messages})
     })
     .then(function(r){return r.json();})
@@ -1254,7 +1340,7 @@ function callAI(messages){
     });
   }
   if(prov==='openai'){
-    var oaiMessages=messages.map(function(m){
+    var oaiMsgs=messages.map(function(m){
       if(typeof m.content==='string')return {role:m.role,content:m.content};
       var parts=m.content.map(function(p){
         if(p.type==='text')return {type:'text',text:p.text};
@@ -1265,8 +1351,8 @@ function callAI(messages){
     });
     return fetch('https://api.openai.com/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+state.apiKey},
-      body:JSON.stringify({model:'gpt-4o',max_tokens:600,messages:oaiMessages})
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'gpt-4o',max_tokens:600,messages:oaiMsgs})
     })
     .then(function(r){return r.json();})
     .then(function(d){
@@ -1285,7 +1371,7 @@ function callAI(messages){
         });
       }
     });
-    return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+state.apiKey,{
+    return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+key,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:gemParts}]})
@@ -1299,7 +1385,6 @@ function callAI(messages){
   }
   return Promise.reject(new Error('Fournisseur IA inconnu'));
 }
-
 function callClaude(messages){return callAI(messages);}
 
 function addManual(){
