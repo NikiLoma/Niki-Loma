@@ -1168,7 +1168,7 @@ function saveIntegrations(){
 }
 
 function clearToday(){if(confirm('Effacer tous les repas d\'aujourd\'hui ?')){state.todayMeals=[];saveState();renderDashboard();toast('Journée effacée');}}
-function resetApp(){if(confirm('Réinitialiser complètement l'application ?')){['nc_v6','nc_v5','nc_v3'].forEach(function(k){localStorage.removeItem(k);});location.reload();}}
+function resetApp(){if(confirm('Réinitialiser complètement l\u0027application ?')){['nc_v6','nc_v5','nc_v3'].forEach(function(k){localStorage.removeItem(k);});location.reload();}}
 
 function exportData(){
   var data=JSON.stringify({profile:state.profile,goals:state.goals,history:state.history,weightLog:state.weightLog,today:state.todayMeals},null,2);
