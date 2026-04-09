@@ -1285,7 +1285,7 @@ function callAI(messages){
         });
       }
     });
-    return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key='+state.apiKey,{
+    return fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+state.apiKey,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:gemParts}]})
@@ -1293,6 +1293,7 @@ function callAI(messages){
     .then(function(r){return r.json();})
     .then(function(d){
       if(d.error)throw new Error(d.error.message||d.error.status);
+      if(!d.candidates||!d.candidates[0])throw new Error('Réponse Gemini vide');
       return d.candidates[0].content.parts[0].text;
     });
   }
